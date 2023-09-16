@@ -1,0 +1,12 @@
+---
+Name: goldfinch-sitemap
+After:
+  - '#googlesitemaproutes'
+---
+SilverStripe\Control\Director:
+  rules:
+    'sitemap.xml': 'Goldfinch\Sitemap\Controllers\GoogleSitemapController'
+
+Wilr\GoogleSitemaps\Control\GoogleSitemapController:
+  extensions:
+    - Goldfinch\Sitemap\Extensions\SitemapControllerExtension
