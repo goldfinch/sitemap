@@ -10,3 +10,9 @@ SilverStripe\Control\Director:
 Wilr\GoogleSitemaps\Control\GoogleSitemapController:
   extensions:
     - Goldfinch\Sitemap\Extensions\SitemapControllerExtension
+
+Wilr\GoogleSitemaps\GoogleSitemap:
+  enabled: true
+  objects_per_sitemap: 1000
+  google_notification_enabled: false
+  use_show_in_search: true
