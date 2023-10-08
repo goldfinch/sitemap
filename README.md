@@ -1,4 +1,6 @@
 ```
 APP_KEY
+APP_SITEMAP_ENCHANT=false
 ```
 #3.0.2
+

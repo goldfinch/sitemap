@@ -9,11 +9,14 @@ class SitemapControllerExtension extends Extension
 {
     public function updateGoogleSitemaps(&$sitemaps)
     {
-        foreach ($sitemaps as $item)
+        if (Environment::getEnv('APP_SITEMAP_ENCHANT'))
         {
-            $key = Environment::getEnv('APP_KEY');
-            $sha = sha1($item->ClassName . substr($key, 8));
-            $item->setField('EncryptedClassName', $sha);
+            foreach ($sitemaps as $item)
+            {
+                $key = Environment::getEnv('APP_KEY');
+                $sha = sha1($item->ClassName . substr($key, 8));
+                $item->setField('EncryptedClassName', $sha);
+            }
         }
     }
 }

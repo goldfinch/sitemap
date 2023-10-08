@@ -2,6 +2,7 @@
 
 namespace Goldfinch\Sitemap\Controllers;
 
+use SilverStripe\Core\Environment;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\HTTPResponse;
 use Wilr\GoogleSitemaps\GoogleSitemap;
@@ -15,50 +16,79 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
 
     public function sitemap()
     {
-        // - custom start
-        $ID = $this->request->param('ID');
-        $OtherID = $this->request->param('OtherID');
-
-        $sitemaps = GoogleSitemap::inst()->getSitemaps();
-        foreach ($sitemaps as $item)
+        if (Environment::getEnv('APP_SITEMAP_ENCHANT'))
         {
-            $key = ss_env('APP_KEY');
-            $sha = sha1($item->ClassName . substr($key, 8));
+            // - custom start
+            $ID = $this->request->param('ID');
+            $OtherID = $this->request->param('OtherID');
 
-            if ($sha === $ID)
+            $sitemaps = GoogleSitemap::inst()->getSitemaps();
+            foreach ($sitemaps as $item)
             {
-                $ID = $item->ClassName;
-                break;
+                $key = ss_env('APP_KEY');
+                $sha = sha1($item->ClassName . substr($key, 8));
+
+                if ($sha === $ID)
+                {
+                    $ID = $item->ClassName;
+                    break;
+                }
             }
-        }
-        // - custom end
+            // - custom end
 
-        $class = $this->unsanitiseClassName($ID);
-        $page = intval($OtherID);
+            $class = $this->unsanitiseClassName($ID);
+            $page = intval($OtherID);
 
-        if ($page) {
-            if (!is_numeric($page)) {
-                return new HTTPResponse('Page not found', 404);
+            if ($page) {
+                if (!is_numeric($page)) {
+                    return new HTTPResponse('Page not found', 404);
+                }
             }
+
+            if (
+                GoogleSitemap::enabled()
+                && $class
+                && ($page > 0)
+                && ($class == SiteTree::class || $class == 'GoogleSitemapRoute' || GoogleSitemap::is_registered($class))
+            ) {
+                $this->getResponse()->addHeader('Content-Type', 'application/xml; charset="utf-8"');
+                $this->getResponse()->addHeader('X-Robots-Tag', 'noindex');
+
+                $items = GoogleSitemap::inst()->getItems($class, $page);
+                $this->extend('updateGoogleSitemapItems', $items, $class, $page);
+
+                return array(
+                    'Items' => $items
+                );
+            }
+
+            return new HTTPResponse('Page not found', 404);
         }
-
-        if (
-            GoogleSitemap::enabled()
-            && $class
-            && ($page > 0)
-            && ($class == SiteTree::class || $class == 'GoogleSitemapRoute' || GoogleSitemap::is_registered($class))
-        ) {
-            $this->getResponse()->addHeader('Content-Type', 'application/xml; charset="utf-8"');
-            $this->getResponse()->addHeader('X-Robots-Tag', 'noindex');
-
-            $items = GoogleSitemap::inst()->getItems($class, $page);
-            $this->extend('updateGoogleSitemapItems', $items, $class, $page);
-
-            return array(
-                'Items' => $items
-            );
+        else
+        {
+            parent::sitemap();
         }
+    }
 
-        return new HTTPResponse('Page not found', 404);
+    public function styleSheetIndex()
+    {
+        $customTemplate = Environment::getEnv('APP_SITEMAP_ENCHANT');
+
+        $html = $this->renderWith($customTemplate ? 'xml-sitemapindex-custom' : 'xml-sitemapindex');
+
+        $this->getResponse()->addHeader('Content-Type', 'text/xsl; charset="utf-8"');
+
+        return $html;
+    }
+
+    public function styleSheet()
+    {
+        $customTemplate = Environment::getEnv('APP_SITEMAP_ENCHANT');
+
+        $html = $this->renderWith($customTemplate ? 'xml-sitemap-custom' : 'xml-sitemap');
+
+        $this->getResponse()->addHeader('Content-Type', 'text/xsl; charset="utf-8"');
+
+        return $html;
     }
 }
