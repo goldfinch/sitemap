@@ -11,7 +11,10 @@ use Wilr\GoogleSitemaps\Control\GoogleSitemapController as Origin_GoogleSitemapC
 class GoogleSitemapController extends Origin_GoogleSitemapController
 {
     private static $allowed_actions = [
+        'index',
         'sitemap',
+        'styleSheetIndex',
+        'styleSheet'
     ];
 
     public function sitemap()
