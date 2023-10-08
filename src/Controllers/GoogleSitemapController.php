@@ -25,6 +25,10 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
             $ID = $this->request->param('ID');
             $OtherID = $this->request->param('OtherID');
 
+            if (!is_sha1($ID)) {
+                return new HTTPResponse('Page not found', 404);
+            }
+
             $sitemaps = GoogleSitemap::inst()->getSitemaps();
             foreach ($sitemaps as $item)
             {
