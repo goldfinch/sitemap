@@ -16,3 +16,7 @@ Wilr\GoogleSitemaps\GoogleSitemap:
   objects_per_sitemap: 1000
   google_notification_enabled: false
   use_show_in_search: true
+
+SilverStripe\Core\Injector\Injector:
+  Wilr\GoogleSitemaps\Extensions\GoogleSitemapSiteTreeExtension:
+    class: Goldfinch\Sitemap\Extensions\GoogleSitemapSiteTreeExtension
