@@ -14,13 +14,12 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
         'index',
         'sitemap',
         'styleSheetIndex',
-        'styleSheet'
+        'styleSheet',
     ];
 
     public function sitemap()
     {
-        if (Environment::getEnv('APP_SITEMAP_ENCHANT'))
-        {
+        if (Environment::getEnv('APP_SITEMAP_ENCHANT')) {
             // - custom start
             $ID = $this->request->param('ID');
             $OtherID = $this->request->param('OtherID');
@@ -30,13 +29,11 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
             }
 
             $sitemaps = GoogleSitemap::inst()->getSitemaps();
-            foreach ($sitemaps as $item)
-            {
+            foreach ($sitemaps as $item) {
                 $key = ss_env('APP_KEY');
                 $sha = sha1($item->ClassName . substr($key, 8));
 
-                if ($sha === $ID)
-                {
+                if ($sha === $ID) {
                     $ID = $item->ClassName;
                     break;
                 }
@@ -53,26 +50,34 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
             }
 
             if (
-                GoogleSitemap::enabled()
-                && $class
-                && ($page > 0)
-                && ($class == SiteTree::class || $class == 'GoogleSitemapRoute' || GoogleSitemap::is_registered($class))
+                GoogleSitemap::enabled() &&
+                $class &&
+                $page > 0 &&
+                ($class == SiteTree::class ||
+                    $class == 'GoogleSitemapRoute' ||
+                    GoogleSitemap::is_registered($class))
             ) {
-                $this->getResponse()->addHeader('Content-Type', 'application/xml; charset="utf-8"');
+                $this->getResponse()->addHeader(
+                    'Content-Type',
+                    'application/xml; charset="utf-8"',
+                );
                 $this->getResponse()->addHeader('X-Robots-Tag', 'noindex');
 
                 $items = GoogleSitemap::inst()->getItems($class, $page);
-                $this->extend('updateGoogleSitemapItems', $items, $class, $page);
-
-                return array(
-                    'Items' => $items
+                $this->extend(
+                    'updateGoogleSitemapItems',
+                    $items,
+                    $class,
+                    $page,
                 );
+
+                return [
+                    'Items' => $items,
+                ];
             }
 
             return new HTTPResponse('Page not found', 404);
-        }
-        else
-        {
+        } else {
             return parent::sitemap();
         }
     }
@@ -81,9 +86,14 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
     {
         $customTemplate = Environment::getEnv('APP_SITEMAP_ENCHANT');
 
-        $html = $this->renderWith($customTemplate ? 'xml-sitemapindex-custom' : 'xml-sitemapindex');
+        $html = $this->renderWith(
+            $customTemplate ? 'xml-sitemapindex-custom' : 'xml-sitemapindex',
+        );
 
-        $this->getResponse()->addHeader('Content-Type', 'text/xsl; charset="utf-8"');
+        $this->getResponse()->addHeader(
+            'Content-Type',
+            'text/xsl; charset="utf-8"',
+        );
 
         return $html;
     }
@@ -92,9 +102,14 @@ class GoogleSitemapController extends Origin_GoogleSitemapController
     {
         $customTemplate = Environment::getEnv('APP_SITEMAP_ENCHANT');
 
-        $html = $this->renderWith($customTemplate ? 'xml-sitemap-custom' : 'xml-sitemap');
+        $html = $this->renderWith(
+            $customTemplate ? 'xml-sitemap-custom' : 'xml-sitemap',
+        );
 
-        $this->getResponse()->addHeader('Content-Type', 'text/xsl; charset="utf-8"');
+        $this->getResponse()->addHeader(
+            'Content-Type',
+            'text/xsl; charset="utf-8"',
+        );
 
         return $html;
     }
