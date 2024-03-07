@@ -14,7 +14,7 @@
         "php": ">=8.0",
         "silverstripe/framework": "^5.0",
         "silverstripe/admin": "^2.0",
-        "goldfinch/helpers": "^1.0",
+        "goldfinch/helpers": "^2.0",
         "wilr/silverstripe-googlesitemaps": "^3.2"
     },
     "autoload": {
